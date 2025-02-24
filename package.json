@@ -1,0 +1,89 @@
+{
+  "name": "qwik-shortcuts-v1",
+  "displayName": "qwik-shortcuts-v1",
+  "description": "",
+  "version": "0.0.1",
+  "engines": {
+    "vscode": "^1.97.0"
+  },
+  "categories": [
+    "Other"
+  ],
+  "activationEvents": [
+    "workspaceContains:astro.config.ts",
+    "workspaceContains:qwik.env.d.ts",
+    "workspaceContains:.astro",
+    "workspaceContains:.vscode/qwik-city.code-snippets",
+    "workspaceContains:.vscode/qwik.code-snippets",
+    "workspaceContains:.vscode/qwik-shortcuts"
+  ],
+  "main": "./out/extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "qwik-shortcuts.addTsxRoute",
+        "title": "Add TSX Route",
+        "category": "Qwik Shortcuts"
+      },
+      {
+        "command": "qwik-shortcuts.addMDXRoute",
+        "title": "Add MDX Route",
+        "category": "Qwik Shortcuts"
+      },
+      {
+        "command": "qwik-shortcuts.addMDRoute",
+        "title": "Add MD Route",
+        "category": "Qwik Shortcuts"
+      },
+      {
+        "command": "qwik-shortcuts.createComponent",
+        "title": "Create Component",
+        "category": "Qwik Shortcuts"
+      },
+      {
+        "command": "qwik-shortcuts.addCreateQwikAstroJSXComponentCommand",
+        "title": "Create Qwik Astro JSX Component",
+        "category": "Qwik Astro Shortcuts"
+      },
+      {
+        "command": "qwik-shortcuts.addCreateQwikAstroTSXComponentCommand",
+        "title": "Create Qwik Astro TSX Component",
+        "category": "Qwik Astro Shortcuts"
+      },
+      {
+        "command": "qwik-shortcuts.addCreateAstroRouteComponentCommand",
+        "title": "Create Astro Route Component",
+        "category": "Qwik Astro Shortcuts"
+      },
+      {
+        "command": "qwik-shortcuts.addQwikUI",
+        "title": "Qwik UI Panel",
+        "category": "Qwik UI Shortcuts"
+      },
+      {
+        "command": "qwik-shortcuts.addQwikDocs",
+        "title": "Qwik Docs Panel",
+        "category": "Qwik Docs Shortcuts"
+      }
+    ]
+  },
+  "scripts": {
+    "vscode:prepublish": "npm run compile",
+    "compile": "tsc -p ./",
+    "watch": "tsc -watch -p ./",
+    "pretest": "npm run compile && npm run lint",
+    "lint": "eslint src",
+    "test": "vscode-test"
+  },
+  "devDependencies": {
+    "@types/vscode": "^1.97.0",
+    "@types/mocha": "^10.0.10",
+    "@types/node": "20.x",
+    "@typescript-eslint/eslint-plugin": "^8.22.0",
+    "@typescript-eslint/parser": "^8.22.0",
+    "eslint": "^9.19.0",
+    "typescript": "^5.7.3",
+    "@vscode/test-cli": "^0.0.10",
+    "@vscode/test-electron": "^2.4.1"
+  }
+}

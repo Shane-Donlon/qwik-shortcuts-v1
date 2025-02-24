@@ -1,0 +1,5 @@
+import { component$ } from "@qwik.dev/core";
+
+export const [name] = component$((props) => {
+  return <div>[name] component works!</div>;
+});
