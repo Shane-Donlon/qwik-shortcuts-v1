@@ -366,14 +366,12 @@ async function addQwikAstroComponent(
 			vscode.window.showErrorMessage("Component Already Exists");
 			return;
 		}
-		let contents = await getTemplate(
+		const contents = await getTemplate(
 			context,
 			type,
 			packageJSonContents as JSON,
 			name,
 		);
-
-		contents = contents.replace(/-([a-z])/g, (match, letter) => letter.toUpperCase());
 
 		const componentDir = `${path}/src/components/qwik/${name}`;
 		fs.mkdirSync(componentDir, { recursive: true });
@@ -428,6 +426,8 @@ async function getTemplate(
 	}
 
 	if (componentName) {
+		let formattedComponentName = componentName.toLowerCase().replace(/-([a-z])/g, (match, letter) => letter.toUpperCase());;
+		formattedComponentName = formattedComponentName.replace(/(^\w|-\w)/g, (match) => match.replace(/-/, "").toUpperCase());
 		const packageJson = packageJsonFileContents;
 
 		interface PackageJson {
@@ -440,7 +440,7 @@ async function getTemplate(
 			"interface[name]Props",
 			"interface [name]Props",
 		);
-		content = content.replaceAll("[name]", componentName);
+		content = content.replaceAll("[name]", formattedComponentName);
 
 		if (isV1) {
 			console.log("isV1");
