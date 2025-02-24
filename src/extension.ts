@@ -429,7 +429,6 @@ async function getTemplate(
 		let formattedComponentName = componentName.toLowerCase().replace(/-([a-z])/g, (match, letter) => letter.toUpperCase());;
 		formattedComponentName = formattedComponentName.replace(/(^\w|-\w)/g, (match) => match.replace(/-/, "").toUpperCase());
 		const packageJson = packageJsonFileContents;
-
 		interface PackageJson {
 			dependencies?: { [key: string]: string };
 		}
@@ -443,7 +442,6 @@ async function getTemplate(
 		content = content.replaceAll("[name]", formattedComponentName);
 
 		if (isV1) {
-			console.log("isV1");
 			const updatedImports = content.replace(
 				"@qwik.dev/core",
 				"@builder.io/qwik",
