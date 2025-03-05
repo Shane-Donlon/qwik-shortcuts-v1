@@ -20,6 +20,7 @@ export async function activate(context: vscode.ExtensionContext) {
 		bun: "bun.lock",
 	};
 
+	let errorMessage: string;
 	for (const manager of [
 		"package.json",
 		...Object.values(filesByPackageManager),
@@ -49,8 +50,6 @@ export async function activate(context: vscode.ExtensionContext) {
 		workspaceRoot as string,
 		filesByPackageManager,
 	)?.command;
-
-	let errorMessage: string;
 
 	const canProceed = (packageManagerUsed: string | undefined) => {
 		errorMessage = "Not a Qwik Project";
@@ -91,7 +90,23 @@ export async function activate(context: vscode.ExtensionContext) {
 		return Boolean(workspaceRoot && isQwikAstro && packageManagerUsed);
 	};
 	const canProceedAstroActivation = currentQwikAstroCanProceed();
-	// still need to register the command so that the errors appear and don't crash the extension
+
+	const isQwik = canProceedActivation;
+	const isQwikAstro = canProceedAstroActivation;
+	if (isQwik) {
+		// custom context is set to filter commands in the command palette menu
+		vscode.commands.registerCommand("extension.setCustomContext", () => {
+			vscode.commands.executeCommand("setContext", "isQwik", true);
+		});
+		vscode.commands.executeCommand("extension.setCustomContext");
+	}
+	if (isQwikAstro) {
+		// custom context is set to filter commands in the command palette menu
+		vscode.commands.registerCommand("extension.setCustomContext", () => {
+			vscode.commands.executeCommand("setContext", "isQwikAstro", true);
+		});
+		vscode.commands.executeCommand("extension.setCustomContext");
+	}
 	const addTsxRouteCommand = vscode.commands.registerCommand(
 		"qwik-shortcuts.addTsxRoute",
 		async () => {

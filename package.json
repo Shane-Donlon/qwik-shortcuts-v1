@@ -19,6 +19,42 @@
   ],
   "main": "./out/extension.js",
   "contributes": {
+    "menus": {
+      "commandPalette": [
+        {
+          "command": "qwik-shortcuts.addTsxRoute",
+          "when": "isQwik == true"
+        },
+        {
+          "command": "qwik-shortcuts.addMDXRoute",
+          "when": "isQwik == true"
+        },
+        {
+          "command": "qwik-shortcuts.addMDRoute",
+          "when": "isQwik == true"
+        },
+        {
+          "command": "qwik-shortcuts.createComponent",
+          "when": "isQwik == true"
+        },
+        {
+          "command": "qwik-shortcuts.addIntegration",
+          "when": "isQwik == true"
+        },
+        {
+          "command": "qwik-shortcuts.addCreateQwikAstroJSXComponentCommand",
+          "when": "isQwikAstro == true"
+        },
+        {
+          "command": "qwik-shortcuts.addCreateQwikAstroTSXComponentCommand",
+          "when": "isQwikAstro == true"
+        },
+        {
+          "command": "qwik-shortcuts.addCreateAstroRouteComponentCommand",
+          "when": "isQwikAstro == true"
+        }
+      ]
+    },
     "commands": [
       {
         "command": "qwik-shortcuts.addTsxRoute",
