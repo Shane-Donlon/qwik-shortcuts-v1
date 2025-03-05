@@ -112,6 +112,17 @@ let errorMessage:string;
 	);
 	context.subscriptions.push(addCreateComponentCommand);
 
+const addIntegration = vscode.commands.registerCommand(
+		"qwik-shortcuts.addIntegration",
+		 () => {
+			canProceed(packageManagerUsed)
+				? addQwikIntegration(packageManagerUsed as string)
+				: vscode.window.showErrorMessage(errorMessage);
+		},
+	);
+	context.subscriptions.push(addIntegration);
+
+
 
 	const addCreateQwikAstroJSXComponentCommand = vscode.commands.registerCommand(
 		"qwik-shortcuts.addCreateQwikAstroJSXComponentCommand",
@@ -654,6 +665,13 @@ function transformSelectedText(text: string): string | undefined {
 
 function addQwikIntegration(packageManager : string){
 // command is a string to not interfere with the command property in the quickPick
+
+let ogImgCommand = "install og-img";
+let tauriCommand = "install @tauri-apps/cli";
+if(packageManager === "yarn"){
+	ogImgCommand = "add og-img";
+	tauriCommand = "add @tauri-apps/cli";
+}
 	const qwikIntegrations = [
 		{"display-name": "AuthJS", "command":"run qwik add auth"},
 		{"display-name":"Bootstrap","command":"run qwik add bootstrap"},
@@ -665,6 +683,21 @@ function addQwikIntegration(packageManager : string){
 		{"display-name":"Qwik Image","command":"install qwik-image"},
 		{"display-name":"Leaflet Map","command":"run qwik add leaflet-map"},
 		{"display-name":"Modular Forms","command":"install @modular-forms/qwik"},
+		{"display-name":"OG Image","command":ogImgCommand},
+		{"display-name":"Orama","command":"run qwik add orama"},
+		{"display-name":"Panda CSS","command":"run qwik add pandacss"},
+		{"display-name":"Partytown","command":"run qwik add partytown"},
+		{"display-name":"Playwright","command":"run qwik add playwright"},
+		{"display-name":"PostCSS","command":"run qwik add postcss"},
+		{"display-name":"Prisma","command":"run qwik add prisma"},
+		{"display-name":"React","command":"run qwik add react"},
+		{"display-name":"Storybook","command":"run qwik add storybook"},
+		{"display-name":"Styled Vanilla Extract","command":"run qwik add styled-vanilla-extract"},
+		{"display-name":"Supabase","command":"install @supabase/supabase-js supabase-auth-helpers-qwik"},
+		{"display-name":"Tailwind","command":"run qwik add tailwind"},
+		{"display-name":"Tauri","command":tauriCommand},
+		{"display-name":"Turso","command":"run qwik add turso"},
+		{"display-name":"Vitest","command":"run qwik add vitest"},
 
 	];
     // const selectedIntegrations: string[] = [];
