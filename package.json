@@ -41,6 +41,11 @@
         "category": "Qwik Shortcuts"
       },
       {
+        "command": "qwik-shortcuts.addIntegration",
+        "title": "Add Qwik Integration",
+        "category": "Qwik Shortcuts"
+      },
+      {
         "command": "qwik-shortcuts.addCreateQwikAstroJSXComponentCommand",
         "title": "Create Qwik Astro JSX Component",
         "category": "Qwik Astro Shortcuts"
