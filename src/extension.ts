@@ -3,6 +3,7 @@ import fs = require("node:fs");
 import path = require("node:path");
 
 export async function activate(context: vscode.ExtensionContext) {
+
 	const workspaceRoot = vscode.workspace.workspaceFolders
 		? vscode.workspace.workspaceFolders[0].uri.fsPath
 		: undefined;
@@ -25,7 +26,10 @@ export async function activate(context: vscode.ExtensionContext) {
 		filesByPackageManager,
 	)?.command;
 
-	const canProceed = () => {
+let errorMessage:string;
+
+	const canProceed = (packageManagerUsed : string | undefined) => {
+		errorMessage = "Not a Qwik Project";
 		const packageJSonContents =
 			JSON.parse(fs.readFileSync(`${workspaceRoot}/package.json`, "utf-8")) ||
 			undefined;
@@ -33,10 +37,17 @@ export async function activate(context: vscode.ExtensionContext) {
 			packageJSonContents?.devDependencies?.["@qwik.dev/router"] ||
 			packageJSonContents?.devDependencies?.["@builder.io/qwik-city"];
 
-		return Boolean(workspaceRoot && isQwik);
+		if(!packageManagerUsed){
+			// vscode.window.showErrorMessage("Package Manager not found");
+			errorMessage = "Package Manager not found";
+			return false;
+		}
+
+		return Boolean(workspaceRoot && isQwik && packageManagerUsed);
 	};
 
 	const currentQwikAstroCanProceed = () => {
+		errorMessage = "Not a Qwik Astro Project";
 		const packageJSonContents =
 			JSON.parse(fs.readFileSync(`${workspaceRoot}/package.json`, "utf-8")) ||
 			undefined;
@@ -50,6 +61,10 @@ export async function activate(context: vscode.ExtensionContext) {
 			filesByPackageManager,
 		)?.command;
 
+		if (!packageManagerUsed) {
+			errorMessage = "Package Manager not found";
+			return false;
+		}
 		return Boolean(workspaceRoot && isQwikAstro && packageManagerUsed);
 	};
 
@@ -60,9 +75,9 @@ export async function activate(context: vscode.ExtensionContext) {
 			// error handling
 			// if these are not here, the extension will crash, and won't show the error messages
 			// this is because context.subscriptions.push(addTsxRouteCommand); will not be called
-			canProceed()
+			canProceed(packageManagerUsed)
 				? await addRoute(packageManagerUsed as string)
-				: vscode.window.showErrorMessage("Not a Qwik Project");
+				: vscode.window.showErrorMessage(errorMessage);
 		},
 	);
 	context.subscriptions.push(addTsxRouteCommand);
@@ -70,9 +85,9 @@ export async function activate(context: vscode.ExtensionContext) {
 	const addMDXRouteCommand = vscode.commands.registerCommand(
 		"qwik-shortcuts.addMDXRoute",
 		async () => {
-			canProceed()
+			canProceed(packageManagerUsed)
 				? await addRoute(packageManagerUsed as string, ".mdx")
-				: vscode.window.showErrorMessage("Not a Qwik Project");
+				: vscode.window.showErrorMessage(errorMessage);
 		},
 	);
 	context.subscriptions.push(addMDXRouteCommand);
@@ -80,9 +95,9 @@ export async function activate(context: vscode.ExtensionContext) {
 	const addMDRouteCommand = vscode.commands.registerCommand(
 		"qwik-shortcuts.addMDRoute",
 		async () => {
-			canProceed()
+			canProceed(packageManagerUsed)
 				? await addRoute(packageManagerUsed as string, ".md")
-				: vscode.window.showErrorMessage("Not a Qwik Project");
+				: vscode.window.showErrorMessage(errorMessage);
 		},
 	);
 	context.subscriptions.push(addMDRouteCommand);
@@ -90,12 +105,13 @@ export async function activate(context: vscode.ExtensionContext) {
 	const addCreateComponentCommand = vscode.commands.registerCommand(
 		"qwik-shortcuts.createComponent",
 		async () => {
-			canProceed()
+			canProceed(packageManagerUsed)
 				? await addComponent(packageManagerUsed as string)
-				: vscode.window.showErrorMessage("Not a Qwik Project");
+				: vscode.window.showErrorMessage(errorMessage);
 		},
 	);
 	context.subscriptions.push(addCreateComponentCommand);
+
 
 	const addCreateQwikAstroJSXComponentCommand = vscode.commands.registerCommand(
 		"qwik-shortcuts.addCreateQwikAstroJSXComponentCommand",
@@ -107,7 +123,7 @@ export async function activate(context: vscode.ExtensionContext) {
 					packageJSonContents as JSON,
 				);
 			} else {
-				vscode.window.showErrorMessage("Not a Qwik Astro Project");
+				vscode.window.showErrorMessage(errorMessage);
 			}
 		},
 	);
@@ -119,7 +135,7 @@ export async function activate(context: vscode.ExtensionContext) {
 		async () => {
 			currentQwikAstroCanProceed()
 				? await addQwikAstroComponent(context, "tsx", packageJSonContents)
-				: vscode.window.showErrorMessage("Not a Qwik Astro Project");
+				: vscode.window.showErrorMessage(errorMessage);
 		},
 	);
 
@@ -131,7 +147,7 @@ export async function activate(context: vscode.ExtensionContext) {
 			if (currentQwikAstroCanProceed()) {
 				await addAstroRoute(context, "route", packageJSonContents);
 			} else {
-				vscode.window.showErrorMessage("Not a Qwik Astro Project");
+				vscode.window.showErrorMessage(errorMessage);;
 			}
 		},
 	);
@@ -212,7 +228,7 @@ function getPackageManager(
 			return { command: packageManager };
 		}
 	}
-	return undefined;
+	return ;
 }
 
 async function addRoute(packageManager: string, fileExtension?: string) {
@@ -316,11 +332,10 @@ function errorHandling(
 	filesByPackageManager: { [key: string]: string },
 ): boolean | undefined {
 	if (!workspaceRoot) {
-		vscode.window.showErrorMessage("Workspace not found.");
 		return false;
 	}
 	if (!isQwik) {
-		vscode.window.showErrorMessage("Not a Qwik Project");
+
 		return false;
 	}
 	if (!packageManagerUsed) {
@@ -634,4 +649,53 @@ function transformSelectedText(text: string): string | undefined {
 		.replace(";", "");
 
 	return transformedText;
+}
+
+
+function addQwikIntegration(packageManager : string){
+// command is a string to not interfere with the command property in the quickPick
+	const qwikIntegrations = [
+		{"display-name": "AuthJS", "command":"run qwik add auth"},
+		{"display-name":"Bootstrap","command":"run qwik add bootstrap"},
+		{"display-name":"Builder.io","command":"run qwik add builder.io"},
+		{"display-name":"Cypress","command":"run qwik add cypress"},
+		{"display-name":"Drizzle","command":"run qwik add drizzle"},
+		{"display-name":"Localization","command":"run qwik add localize"},
+		{"display-name":"Qwikest Icons","command":"install @qwikest/icons"},
+		{"display-name":"Qwik Image","command":"install qwik-image"},
+		{"display-name":"Leaflet Map","command":"run qwik add leaflet-map"},
+		{"display-name":"Modular Forms","command":"install @modular-forms/qwik"},
+
+	];
+    // const selectedIntegrations: string[] = [];
+	const quickPick = vscode.window.createQuickPick();
+	// quickPick.canSelectMany = true;
+	quickPick.items = qwikIntegrations.map((integration) => ({
+		label: integration["display-name"],
+		description: integration.command,
+	}));
+	quickPick.show();
+
+	quickPick.onDidChangeSelection((selection) => {
+		if (selection[0].description) {
+			const selectedIntegration = selection[0].description;
+			const terminal = vscode.window.createTerminal("Qwik Shortcuts");
+			// example: pnpm run qwik add auth
+			terminal.sendText(`${packageManager} ${selectedIntegration}`);
+			terminal.show();
+		}
+	});
+
+
+	// todo: think about how to handle multiple selections?
+	// ? should we have this option?
+	// quickPick.onDidAccept(() => {
+	// 	for (let index = 0; index < selectedIntegrations.length; index++) {
+	// 		const element = selectedIntegrations[index];
+	// 		const terminal = vscode.window.createTerminal("Qwik Shortcuts");
+	// 		terminal.sendText(`${packageManager} ${element}`);
+	// 		terminal.show();
+	// 	}
+	// });
+
 }
