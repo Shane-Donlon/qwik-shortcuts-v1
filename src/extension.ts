@@ -20,7 +20,6 @@ export async function activate(context: vscode.ExtensionContext) {
 		bun: "bun.lock",
 	};
 
-	let errorMessage: string;
 	for (const manager of [
 		"package.json",
 		...Object.values(filesByPackageManager),
@@ -39,12 +38,16 @@ export async function activate(context: vscode.ExtensionContext) {
 			activate(context);
 		});
 		ManagerWatcher.onDidDelete(() => {
+			// custom context is set to filter commands in the command palette menu
+			setCustomContext(null, null);
 			// vscode.window.showInformationMessage(`${manager} has been deleted.`);
 			deactivate(context);
 			activate(context);
 		});
 		context.subscriptions.push(ManagerWatcher);
 	}
+
+	let errorMessage: string;
 
 	const packageManagerUsed = getPackageManager(
 		workspaceRoot as string,
@@ -67,6 +70,7 @@ export async function activate(context: vscode.ExtensionContext) {
 
 		return Boolean(workspaceRoot && isQwik && packageManagerUsed);
 	};
+
 	const canProceedActivation = canProceed(packageManagerUsed);
 
 	const currentQwikAstroCanProceed = () => {
@@ -93,20 +97,11 @@ export async function activate(context: vscode.ExtensionContext) {
 
 	const isQwik = canProceedActivation;
 	const isQwikAstro = canProceedAstroActivation;
-	if (isQwik) {
-		// custom context is set to filter commands in the command palette menu
-		vscode.commands.registerCommand("extension.setCustomContext", () => {
-			vscode.commands.executeCommand("setContext", "isQwik", true);
-		});
-		vscode.commands.executeCommand("extension.setCustomContext");
-	}
-	if (isQwikAstro) {
-		// custom context is set to filter commands in the command palette menu
-		vscode.commands.registerCommand("extension.setCustomContext", () => {
-			vscode.commands.executeCommand("setContext", "isQwikAstro", true);
-		});
-		vscode.commands.executeCommand("extension.setCustomContext");
-	}
+
+	// custom context is set to filter commands in the command palette menu
+
+	setCustomContext(isQwik, isQwikAstro);
+
 	const addTsxRouteCommand = vscode.commands.registerCommand(
 		"qwik-shortcuts.addTsxRoute",
 		async () => {
@@ -774,4 +769,9 @@ function addQwikIntegration(packageManager: string) {
 	// 		terminal.show();
 	// 	}
 	// });
+}
+
+function setCustomContext(isQwik: boolean | null, isQwikAstro: boolean | null) {
+	vscode.commands.executeCommand("setContext", "isQwik", isQwik);
+	vscode.commands.executeCommand("setContext", "isQwikAstro", isQwikAstro);
 }
